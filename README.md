@@ -1,1 +1,1 @@
-hubble-scraper
+# Script to download images from the motorola Hubble Connected camera alert system using Selenium and Beautiful Soup
