@@ -29,7 +29,11 @@ logging.info("Logging system active")
 chrome_options.add_experimental_option("prefs", prefs)
 logging.info("Chrome experimental options set")
 
-with open('credentials.txt', 'r') as f:
+script_dir = os.path.dirname(__file__)
+rel_path = 'credentials.txt'
+abs_file_path = os.path.join(script_dir, rel_path)
+
+with open(abs_file_path, 'r') as f:
     load = f.readlines()
 login = load[0]
 password = load[1]
@@ -93,6 +97,7 @@ for file in os.listdir(pos):
     k = k.split('.')[0]
     names.append(k)
 logging.info('Current images scanned')
+save_file_path = os.path.join(script_dir, 'saves/')
 for i in range(len(adresses)):
     if str(adresses[i]).startswith(
             'https://hubble-resources.s3.amazonaws.com/freemium/'):
@@ -104,7 +109,7 @@ for i in range(len(adresses)):
         ident = idt.split('.')[0]
         if ident not in names:
             logging.info('unique found')
-            name = 'saves/' + str(dt) + '-' + str(ident) + '.jpg'
+            name = save_file_path + str(dt) + '-' + str(ident) + '.jpg'
             try:
                 urllib.request.urlretrieve(location, name)
             except Exception as E:
