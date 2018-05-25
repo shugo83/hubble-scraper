@@ -41,9 +41,9 @@ logging.info('Credentials Loaded')
 driver = webdriver.Chrome(chrome_options=chrome_options)
 driver.set_window_size(1920, 1080)  # ensures responsive design does not hide relevant buttons
 driver.get("https://app.hubbleconnected.com/#login")
-username_field = driver.find_element_by_name("username")
-password_field = driver.find_element_by_name("password")
-login_button = driver.find_element_by_id("login_submit")
+username_field = driver.find_element_by_name("hubble-signin-username")
+password_field = driver.find_element_by_name("hubble-signin-password")
+login_button = driver.find_element_by_id("hubble-signin")
 
 username_field.send_keys(login)
 password_field.send_keys(password)
