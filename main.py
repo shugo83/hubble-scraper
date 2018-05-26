@@ -9,13 +9,16 @@ from bs4 import BeautifulSoup
 import time
 import os
 import logging
+import sys
 from datetime import datetime
-timeout = 10
+timeout = 30
+count = 0
 chrome_options = Options()
 adresses = []
 images = []
 names = []
 waiting = True
+idxpath = '//*[@id="hubble-camsetn-camnotify"]/div[2]/ul/li[1]/div[1]'
 prefs = {
     "profile.default_content_setting_values.plugins": 1,
     "profile.content_settings.plugin_whitelist.adobe-flash-player": 1,
@@ -50,18 +53,20 @@ password_field.send_keys(password)
 login_button.click()
 logging.info('logged in')
 while waiting:
-    time.sleep(0.5)
+    time.sleep(2)
     try:
-        timeline_button = driver.find_element_by_class_name("timeline-tab")
+        timeline_button = driver.find_element_by_class_name("hubble-dash-playwrap")
         timeline_button.click()
         waiting = False
     except Exception as E:
         logging.error(E)
-
+        count += 2
+        if count > timeout:
+            sys.exit(0)
 
 try:
     element_present = EC.presence_of_element_located(
-            (By.ID, 'timeline_container'))
+            (By.XPATH, idxpath))
     WebDriverWait(driver, timeout).until(element_present)
     logging.info('Waiting')
 except TimeoutException:
@@ -70,25 +75,9 @@ except TimeoutException:
 logging.info('Looking')
 html = driver.page_source
 soup = BeautifulSoup(html, 'html.parser')
-for link in soup.find_all('a'):
-    adresses.append(link.get('href'))
-
-try:
-    timeline_next = driver.find_element_by_class_name("pagelinks-last")
-    count = 0
-    while count < 10:  # Maximum number of page expected
-        timeline_next.click()
-        time.sleep(5)  # not sure of an alternative
-        logging.info('looking on page' + count)
-        html = driver.page_source
-        soup = BeautifulSoup(html, 'html.parser')
-        for link in soup.find_all('a'):
-            if link.get('href') not in adresses:
-                adresses.append(link.get('href'))
-except:
-    logging.info('No further pages found')
+for link in soup.find_all('img'):
+    adresses.append(link.get('src'))
 driver.quit()
-
 
 script_dir = os.path.dirname(__file__)
 pos = script_dir + '/saves'
@@ -96,6 +85,7 @@ for file in os.listdir(pos):
     k = file.split('-')[-1]
     k = k.split('.')[0]
     names.append(k)
+logging.debug(adresses)
 logging.info('Current images scanned')
 save_file_path = os.path.join(script_dir, 'saves/')
 for i in range(len(adresses)):
