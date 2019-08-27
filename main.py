@@ -11,14 +11,11 @@ import os
 import logging
 import sys
 from datetime import datetime
+
 timeout = 30
-count = 0
-image_found = 0
-image_unique = 0
+count = image_found = image_unique = 0
 chrome_options = Options()
-adresses = []
-images = []
-names = []
+adresses = images = names = []
 waiting = True
 idxpath = '//*[@id="hubble-camsetn-camnotify"]/div[2]/ul/li[1]/div[1]'
 prefs = {
@@ -27,7 +24,9 @@ prefs = {
     "profile.content_settings.exceptions.plugins.*,*.per_resource.adobe-flash-player": 1,
     "PluginsAllowedForUrls": "https://app.hubbleconnected.com/#devices"
                              "https://app.hubbleconnected.com/#login"
+                             "https://app.hubbleconnected.com/dashboard"
 }
+
 format_string = '%(asctime)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=format_string,
                     filename='hubble.log',
@@ -46,8 +45,8 @@ with open(abs_file_path, 'r') as f:
 login = load[0]
 password = load[1]
 logging.info('Credentials Loaded')
-driver = webdriver.Chrome(chrome_options=chrome_options)
-driver.set_window_size(1920, 1080)  # ensures responsive design does not hide relevant buttons
+driver = webdriver.Chrome(options=chrome_options)
+driver.set_window_size(1600, 900)  # ensures responsive design does not hide relevant buttons
 driver.get('https://app.hubbleconnected.com/#login')
 username_field = driver.find_element_by_name('hubble-signin-username')
 password_field = driver.find_element_by_name('hubble-signin-password')
@@ -103,7 +102,7 @@ for i in range(len(adresses)):
         image_found += 1
         images.append(adresses[i])
         location = adresses[i]
-        dt = datetime.now().strftime('%y-%m-%d')
+        dt = datetime.now().strftime('%Y-%m-%d')
         idt = adresses[i].split('/')[8]
         ident = idt.split('.')[0]
         if ident not in names:
